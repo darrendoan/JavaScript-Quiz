@@ -9,6 +9,8 @@
 <body>
     <div class="app">
         <h1>Quiz</h1>
+        <div class="time" id="time-countdown"></div>
+        <div id="personal-score" onload="loadScore()"></div>
         <div class="button-style">
             <button id="start-button" onclick="startQuiz()">START</button>
         </div>
@@ -23,6 +25,8 @@
                 <button class="btn">Answer 4</button>
             </div>
             <button id="next-btn">Next</button>
+            <textarea id="msg" name="comments"></textarea>
+            <button id="submit" onclick="storeScore()">Submit & Play Again</button>
         </div>
     </div>
     <script src="assets/js/script.js"></script>

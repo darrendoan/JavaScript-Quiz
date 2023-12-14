@@ -42,6 +42,9 @@ var answerButtons = document.getElementById("answer-buttons");
 var nextButton = document.getElementById("next-btn");
 var startButton = document.getElementById("start-button");
 var quizBody = document.getElementById("quiz-body");
+var submitButton = document.getElementById("submit");
+var textArea = document.getElementById("msg");
+var personalScore = document.getElementById("personal-score")
 
 let currentQuestionIndex = 0;
 let score = 0; 
@@ -55,6 +58,8 @@ function startQuiz() {
     score = 0;
     nextButton.innerHTML = "Next";
     showQuestion(); 
+    setTime();
+    loadScore();
 }
 
 function showQuestion() {
@@ -78,6 +83,7 @@ function showQuestion() {
 
 function resetState(){
     nextButton.style.display = "none";
+    submitButton.style.display = "none";
     while(answerButtons.firstChild){
         answerButtons.removeChild(answerButtons.firstChild)
     }
@@ -88,9 +94,11 @@ function selectAnswer(e) {
     var isCorrect = selectedBtn.dataset.correct === "true";
     if(isCorrect){
         selectedBtn.classList.add("correct");
-        score++
+        score++;
+        secondsLeft++;
     } else {
         selectedBtn.classList.add("incorrect");
+        secondsLeft-=5;
     }
     Array.from(answerButtons.children).forEach(button => {
         if(button.dataset.correct === "true"){
@@ -101,11 +109,43 @@ function selectAnswer(e) {
     nextButton.style.display = "block";
 }
 
+
+
 function showScore() {
     resetState();
     questionEl.innerHTML = `You have scored ${score} out of ${questions.length}!`;
-    nextButton.innerHTML = "Play Again!"
-    nextButton.style.display = "block";
+    nextButton.style.display = "none";
+    textArea.style.display = "block";
+    submitButton.style.display = "block";
+}
+
+submitButton.addEventListener("click", storeScore)
+function storeScore() {
+    timeEl.textContent = " ";
+    var scoreInfo = {
+        score: score,
+        initial: textArea.value,
+    }
+    if(!textArea.value) {
+        alert("Please Type Initials")
+    } else {
+        localStorage.setItem("scoreData" , JSON.stringify(scoreInfo));
+        location.reload(); 
+    }
+}
+
+
+personalScore.addEventListener("load", loadScore)
+
+function loadScore() {
+    if(localStorage !== null){
+        var data = JSON.parse(localStorage.getItem("scoreData"))
+        var initial = data["initial"]
+        var savedScore = data["score"]
+        personalScore.textContent = "Latest score is " + savedScore + " by " + initial;
+        console.log(data);
+    }
+
 }
 
 function handleNextButton() {
@@ -121,6 +161,29 @@ nextButton.addEventListener("click" , ()=>{
     if(currentQuestionIndex < questions.length){
         handleNextButton();
     } else {
-        startQuiz();
+        location.reload()
     }
 });
+
+// all code below was taken from classwork
+
+var timeEl = document.querySelector(".time");
+
+var mainEl = document.getElementById("time-countdown");
+
+var secondsLeft = 30;
+
+function setTime() {
+  var timerInterval = setInterval(function() {
+    secondsLeft--;
+    ;
+
+    if(secondsLeft >= 0) {
+      timeEl.textContent = secondsLeft + " seconds left until the quiz is over."
+    } else {
+      clearInterval(timerInterval);
+      showScore();
+    }
+  }, 1000);
+}; 
+
